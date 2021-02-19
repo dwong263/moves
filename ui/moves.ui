@@ -33,7 +33,7 @@
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Dickson Wong, Robarts Research Institute, 2017&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Dickson Wong, Robarts Research Institute, 2017 (Updated 2021 for Python 3)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
@@ -53,7 +53,7 @@
       </font>
      </property>
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;MoVeS (v0.1)&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Semi-Automated &lt;/span&gt;Mo&lt;span style=&quot; font-weight:400;&quot;&gt;use &lt;/span&gt;Ve&lt;span style=&quot; font-weight:400;&quot;&gt;ntricle &lt;/span&gt;S&lt;span style=&quot; font-weight:400;&quot;&gt;egmentation Software&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;MoVeS (v0.3)&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:400;&quot;&gt;Semi-Automated &lt;/span&gt;Mo&lt;span style=&quot; font-weight:400;&quot;&gt;use &lt;/span&gt;Ve&lt;span style=&quot; font-weight:400;&quot;&gt;ntricle &lt;/span&gt;S&lt;span style=&quot; font-weight:400;&quot;&gt;egmentation Software&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
