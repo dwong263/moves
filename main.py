@@ -37,7 +37,7 @@ class MouseInteractorHighLightActor(vtk.vtkInteractorStyleTrackballCamera):
 			try:
 				self.SelectedRegions.remove(NewPickedActor)
 			except Exception as e:
-				print '  |', e, '... nothing removed.'
+				print('  |', e, '... nothing removed.')
 
 			NewPickedActor.GetProperty().SetColor(214.0/255.0, 39.0/255.0, 40.0/255.0)
 			NewPickedActor.GetProperty().SetOpacity(0.6)
@@ -47,7 +47,7 @@ class MouseInteractorHighLightActor(vtk.vtkInteractorStyleTrackballCamera):
 			try:
 				self.DeselectedRegions.remove(NewPickedActor)
 			except Exception as e:
-				print '  |', e, '... nothing removed.'
+				print('  |', e, '... nothing removed.')
 
 			self.SelectedVolume()
 
@@ -66,7 +66,7 @@ class MouseInteractorHighLightActor(vtk.vtkInteractorStyleTrackballCamera):
 			try:
 				self.DeselectedRegions.remove(NewPickedActor)
 			except Exception as e:
-				print '  |', e, '... nothing removed.'
+				print('  |', e, '... nothing removed.')
 
 			NewPickedActor.GetProperty().SetColor(31.0/255.0, 119.0/255.0, 180.0/255.0)
 			NewPickedActor.GetProperty().SetOpacity(0.6)
@@ -76,7 +76,7 @@ class MouseInteractorHighLightActor(vtk.vtkInteractorStyleTrackballCamera):
 			try:
 				self.SelectedRegions.remove(NewPickedActor)
 			except Exception as e:
-				print '  |', e, '... nothing removed.'
+				print('  |', e, '... nothing removed.')
 
 			self.SelectedVolume()
 
@@ -92,9 +92,8 @@ class MouseInteractorHighLightActor(vtk.vtkInteractorStyleTrackballCamera):
 			vol = vol + data.GetVolume()
 			sa  = sa  + data.GetSurfaceArea()
 
-		print 'Selected Volume:      ', vol
-		print 'Selected Surface Area:', sa
-		print ''
+		print('  | Selected Volume:      ', vol)
+		print('  | Selected Surface Area:', sa)
 
 		return vol, sa
 
@@ -145,10 +144,10 @@ class MyApp(QtWidgets.QWidget, Ui_MainWindow):
 			self.VEN_VOLs  = [] # store ventricle volumes
 			self.VEN_SAs   = [] # store ventricle surface areas
 
-			self.NUM_IMGS  = sp.size(self.imageList)
+			self.NUM_IMGS  = np.size(self.imageList)
 
 			# Set up the results table.
-			self.resultsTable.setRowCount(sp.size(self.imageList))
+			self.resultsTable.setRowCount(np.size(self.imageList))
 			for i, file in enumerate(self.imageList):
 				ID = file.split('/')[-1].split('.')[0].replace('_std_brain_csf', '')
 				self.MOUSE_IDs.append(str(ID))
@@ -165,7 +164,6 @@ class MyApp(QtWidgets.QWidget, Ui_MainWindow):
 			self.saveButton.setEnabled(True)
 
 	def extractRegions(self, image):
-
 		# read image
 		reader = vtk.vtkNIFTIImageReader()
 		reader.SetFileName(image)
@@ -195,31 +193,30 @@ class MyApp(QtWidgets.QWidget, Ui_MainWindow):
 		region_sizes_np  = array('l', [0]*region_sizes_vtk.GetSize())
 		region_sizes_vtk.ExportToVoidPointer(region_sizes_np)
 
-		print 'Processing image ...', image
-		print '  |', region_sizes_np
+		print('\nProcessing image ...', image)
+		# print('  |', region_sizes_np)
 
 		# render potential isosurfaces belonging to ventricles
 		for index, size in enumerate(np.sort(region_sizes_np)):
-			if size > 100:
-				pdcf_ven = vtk.vtkPolyDataConnectivityFilter()
-				pdcf_ven.SetInputConnection(dmc.GetOutputPort())
-				pdcf_ven.AddSpecifiedRegion(np.argsort(region_sizes_np)[index])
-				pdcf_ven.SetExtractionModeToSpecifiedRegions()
+			pdcf_ven = vtk.vtkPolyDataConnectivityFilter()
+			pdcf_ven.SetInputConnection(dmc.GetOutputPort())
+			pdcf_ven.AddSpecifiedRegion(np.argsort(region_sizes_np)[index])
+			pdcf_ven.SetExtractionModeToSpecifiedRegions()
 
-				mapper = vtk.vtkPolyDataMapper()
-				mapper.SetInputConnection(pdcf_ven.GetOutputPort())
-				mapper.ScalarVisibilityOff()
+			mapper = vtk.vtkPolyDataMapper()
+			mapper.SetInputConnection(pdcf_ven.GetOutputPort())
+			mapper.ScalarVisibilityOff()
 
-				actor = vtk.vtkActor()
-				actor.SetMapper(mapper)
+			actor = vtk.vtkActor()
+			actor.SetMapper(mapper)
 
-				prop = vtk.vtkProperty()
-				prop.SetColor(31.0/255.0, 119.0/255.0, 180.0/255.0)
-				prop.SetOpacity(0.6)
+			prop = vtk.vtkProperty()
+			prop.SetColor(31.0/255.0, 119.0/255.0, 180.0/255.0)
+			prop.SetOpacity(0.6)
 
-				actor.SetProperty(prop)
+			actor.SetProperty(prop)
 
-				self.renderer.AddActor(actor)
+			self.renderer.AddViewProp(actor)
 
 		self.resetCamera()
 
@@ -232,22 +229,27 @@ class MyApp(QtWidgets.QWidget, Ui_MainWindow):
 		self.renderer.ResetCamera()
 
 	def finalizeSelection(self):
+		print (' | Getting data from selected regions ...')
 		selectedActors = self.style.SelectedRegions
 		
 		selectedVolume, selectedSA = self.style.SelectedVolume()
 		self.resultsTable.setItem(self.IMG_PTR, 3, QtWidgets.QTableWidgetItem(str(selectedVolume)))
 		self.resultsTable.setItem(self.IMG_PTR, 4, QtWidgets.QTableWidgetItem(str(selectedSA)))
 
+		print (' | Resetting the camera ...')
 		self.resetCamera()
 
+		print (' | Clearing renderer and interactor ...')
 		for actor in self.renderer.GetActors():
-			self.renderer.RemoveActor(actor)
+			self.renderer.RemoveViewProp(actor)
 		self.style.Clear()
 
+		print (' | Appending selected polydata to view ...')
 		appender = vtk.vtkAppendPolyData()
 		for actor in selectedActors:
 			appender.AddInputData(actor.GetMapper().GetInput())
 
+		print (' | Depth sort for proper visualization ...')
 		# depth sort fixes visualization problems, but requires one actor for multiple meshes.
 		# therefore, depth sorting is not yet fixed during selection process.
 		# but proper depth sorting is used when the ventricle image is output
@@ -272,13 +274,14 @@ class MyApp(QtWidgets.QWidget, Ui_MainWindow):
 		prop.SetOpacity(0.6)
 		
 		actor.SetProperty(prop)
-		self.renderer.AddActor(actor)
+		self.renderer.AddViewProp(actor)
 		self.resetCamera()
 
 		self.resetCameraButton.setEnabled(False)
 		self.finalizeButton.setEnabled(False)
 
 		# Save Visualization
+		print(' | Saving visualization ...')
 		w2if = vtk.vtkWindowToImageFilter()
 		w2if.SetInput(self.vtkWidget.GetRenderWindow())
 		w2if.Update()
@@ -293,16 +296,19 @@ class MyApp(QtWidgets.QWidget, Ui_MainWindow):
 			self.nextImageButton.setEnabled(True)
 
 	def nextImage(self):
+		print('\nFetching next image ...')
 		self.IMG_PTR = self.IMG_PTR + 1
 
 		# Clear render
+		print('  | Clearing renderer and interactor ...')
 		for actor in self.renderer.GetActors():
-			self.renderer.RemoveActor(actor)
+			self.renderer.RemoveViewProp(actor)
 
 		# Clear interactor
 		self.style.Clear()
 
 		# Load next image
+		print('  | Load next image ...')
 		self.extractRegions(self.imageList[self.IMG_PTR])
 
 		self.nextImageButton.setEnabled(False)
